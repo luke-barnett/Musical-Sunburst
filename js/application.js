@@ -76,7 +76,7 @@ function Track(id, name, playcount, listeners, duration){
 	}
 	
 	this.parentColour = function(pColour){
-		_colour = derriveColour(pColour)
+		_colour = deriveColour(pColour)
 	}
 }
 
@@ -107,7 +107,7 @@ function Artist(id, name){
 	}
 	
 	this.parentColour = function(pColour){
-		_colour = derriveColour(pColour)
+		_colour = deriveColour(pColour)
 		$.each(_tracks, function(key, track){
 			track.parentColour(_colour);
 		});
@@ -301,16 +301,13 @@ function brightness(rgb) {
 }
 
 function randomColour(){
-    var letters = '0123456789ABCDEF'.split('');
-    var colour = '#';
-    for (var i = 0; i < 6; i++ ) {
-        colour += letters[Math.round(Math.random() * 15)];
-    }
-    return colour;
+    return d3.hsl(Math.floor(Math.random()*360), .4 + (1 - .4) * Math.random(), .3 + (1 - .4) * Math.random()).toString();
 }
 
-function derriveColour(baseColour){
-	return baseColour;
+function deriveColour(baseColour){
+	baseHSL = d3.hsl(baseColour);
+	var randomnumber=Math.floor(Math.random()*11)
+	return d3.hsl(baseHSL.h + Math.floor(Math.random() * 40) - 20, baseHSL.s + .3 * Math.random() - .15 , baseHSL.l + .3 * Math.random() - .15);
 }
 
 function processArtists(){
