@@ -234,7 +234,7 @@ function processGraph(){
 												console.log(d + " " + d.dx * 100 / limit);
 												var _name = d.name;
 												if(_name != undefined){
-													return (d.dx * 100 / limit < 0.01 || _name.length * 12 > radius / 3) ? "hidden" : null;
+													return (d.dx * 100 / limit < 0.02 || _name.length * 12 > radius / 3) ? "hidden" : null;
 												}else
 													return "hidden";
 											});
@@ -269,7 +269,7 @@ function processGraph(){
 			if(_isParent){
 				var _text = d3.select(this.children[0]);
 				console.log(e.dx * ((d.depth + 1)) * 100 / limit);
-				_text.style("visibility", (!_isParent || e.dx * ((d.depth + 1)) * 100 / limit < 0.01 || (e.name != undefined && e.name.length * 12 > radius / (3 - d.depth))) ? "hidden" : null);
+				_text.style("visibility", (!_isParent || e.dx * ((d.depth + 1)) * 100 / limit < 0.02 || (e.name != undefined && e.name.length * 12 > radius / (3 - d.depth))) ? "hidden" : null);
 			}
 			_this.style("visibility", _isParent ? null : "hidden");
 		});
