@@ -74,6 +74,10 @@ function Track(id, name, playcount, listeners, duration){
 	this.getColour = function(){
 		return _colour;
 	}
+	
+	this.parentColour = function(pColour){
+		_colour = derriveColour(pColour)
+	}
 }
 
 function Artist(id, name){
@@ -101,6 +105,13 @@ function Artist(id, name){
 	this.getColour = function(){
 		return _colour;
 	}
+	
+	this.parentColour = function(pColour){
+		_colour = derriveColour(pColour)
+		$.each(_tracks, function(key, track){
+			track.parentColour(_colour);
+		});
+	}
 }
 
 function Genre(name){
@@ -110,6 +121,7 @@ function Genre(name){
 	var _artists = [];
 	
 	this.addArtist = function(artist){
+		artist.parentColour(_colour);
 		_artists.push(artist);
 	}
 	
@@ -249,18 +261,18 @@ function processGraph(){
 	}
 }
 
-function isParentOf(p, c) {
+function isParentOf(p, c){
   if (p === c) return true;
-  if (p.children) {
-    return p.children.some(function(d) {
+  if (p.children){
+    return p.children.some(function(d){
       return isParentOf(d, c);
     });
   }
   return false;
 }
 
-function colour(d) {
-	if (d.children) {
+function colour(d){
+	if (d.children){
 		var	colours = d.children.map(colour),
 			a = d3.hsl(colours[0]),
 			b = d3.hsl(colours[1]);
@@ -269,7 +281,7 @@ function colour(d) {
 	return d.colour || "#ffffff"; 
 }
 
-function arcTween(d) {
+function arcTween(d){
 	var	my = maxY(d),
 		xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
 		yd = d3.interpolate(y.domain(), [d.y, my]),
@@ -279,7 +291,7 @@ function arcTween(d) {
 		};
 }
 
-function maxY(d) {
+function maxY(d){
 	return d.children ? Math.max.apply(Math, d.children.map(maxY)) : d.y + d.dy;
 }
 
@@ -288,13 +300,17 @@ function brightness(rgb) {
 	  return rgb.r * .299 + rgb.g * .587 + rgb.b * .114;
 }
 
-function randomColour() {
+function randomColour(){
     var letters = '0123456789ABCDEF'.split('');
     var colour = '#';
     for (var i = 0; i < 6; i++ ) {
         colour += letters[Math.round(Math.random() * 15)];
     }
     return colour;
+}
+
+function derriveColour(baseColour){
+	return baseColour;
 }
 
 function processArtists(){
