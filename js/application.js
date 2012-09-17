@@ -45,6 +45,7 @@ function Track(id, name, playcount, listeners, duration){
 	var _playcount = playcount;
 	var _listeners = listeners;
 	var _duration = duration;
+	var _colour = randomColour();
 	
 	this.getID = function(){
 		return _id;
@@ -71,13 +72,14 @@ function Track(id, name, playcount, listeners, duration){
 	}
 	
 	this.getColour = function(){
-		return randomColour();
+		return _colour;
 	}
 }
 
 function Artist(id, name){
 	var _id = id;
 	var _name = name;
+	var _colour = randomColour();
 	var _tracks = [];
 	
 	this.getID = function(){
@@ -97,12 +99,13 @@ function Artist(id, name){
 	}
 
 	this.getColour = function(){
-		return randomColour();
+		return _colour;
 	}
 }
 
 function Genre(name){
 	var _name = name;
+	var _colour = randomColour();
 	
 	var _artists = [];
 	
@@ -119,7 +122,7 @@ function Genre(name){
 	}
 	
 	this.getColour = function(){
-		return randomColour();
+		return _colour;
 	}
 }
 
