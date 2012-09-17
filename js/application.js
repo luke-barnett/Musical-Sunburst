@@ -229,7 +229,15 @@ function processGraph(){
 		
 	textEnter.append("tspan")
 		.attr("x", 0)
-		.text(function(d) { return d.depth ? d.name : ""; });
+		.text(function(d) { return d.depth ? d.name : ""; })
+		.style("visibility", 	function(d)	{
+												console.log(d + " " + d.dx * 100 / limit);
+												var _name = d.name;
+												if(_name != undefined){
+													return (d.dx * 100 / limit < 0.01 || _name.length * 12 > radius / 3) ? "hidden" : null;
+												}else
+													return "hidden";
+											});
 
 	function click(d) {
 		path.transition()
@@ -256,7 +264,14 @@ function processGraph(){
 		})
 		.style("fill-opacity", function(e) { return isParentOf(d, e) ? 1 : 1e-6; })
 		.each("end", function(e) {
-			d3.select(this).style("visibility", isParentOf(d, e) ? null : "hidden");
+			var _this = d3.select(this);
+			var _isParent = isParentOf(d, e);
+			if(_isParent){
+				var _text = d3.select(this.children[0]);
+				console.log(e.dx * ((d.depth + 1)) * 100 / limit);
+				_text.style("visibility", (!_isParent || e.dx * ((d.depth + 1)) * 100 / limit < 0.01 || (e.name != undefined && e.name.length * 12 > radius / (3 - d.depth))) ? "hidden" : null);
+			}
+			_this.style("visibility", _isParent ? null : "hidden");
 		});
 	}
 }
@@ -313,11 +328,9 @@ function deriveColour(baseColour){
 function processArtists(){
 	processedArtists = 0
 	$.each(artists, function(key, artist){
-		console.log(artistURL + artist.getID());
 		$.getJSON(
 			artistURL + artist.getID(),
 			function(data){
-				console.log(data);
 				if(data.error == undefined){
 					var _genre = GetGenre(data.artist.tags.tag[0].name);
 					

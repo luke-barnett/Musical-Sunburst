@@ -4,6 +4,6 @@ body {
 
 path {
 	stroke: black;
-	stroke-width: 1.5;
+	stroke-width: 0.5;
 	cursor: pointer;
 }
