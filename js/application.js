@@ -52,7 +52,7 @@ function Track(id, name, playcount, listeners, duration){
 	}
 	
 	this.getName = function(){
-		return _name;
+		return _name.replace(new RegExp('"', "g"), '');
 	}
 	
 	this.getPlayCount = function(){
@@ -301,40 +301,46 @@ function brightness(rgb) {
 }
 
 function randomColour(){
-    return d3.hsl(Math.floor(Math.random()*360), .4 + (1 - .4) * Math.random(), .3 + (1 - .4) * Math.random()).toString();
+    return d3.hsl(Math.floor(Math.random()*360), .2 + (.6 - .2) * Math.random(), .3 + (.7 - .3) * Math.random()).toString();
 }
 
 function deriveColour(baseColour){
 	baseHSL = d3.hsl(baseColour);
 	var randomnumber=Math.floor(Math.random()*11)
-	return d3.hsl(baseHSL.h + Math.floor(Math.random() * 40) - 20, baseHSL.s + .3 * Math.random() - .15 , baseHSL.l + .3 * Math.random() - .15);
+	return d3.hsl(baseHSL.h + Math.floor(Math.random() * 40) - 20, baseHSL.s + .4 * Math.random() , baseHSL.l + .2 * Math.random() - .10);
 }
 
 function processArtists(){
 	processedArtists = 0
 	$.each(artists, function(key, artist){
+		console.log(artistURL + artist.getID());
 		$.getJSON(
 			artistURL + artist.getID(),
 			function(data){
-				var _genre = GetGenre(data.artist.tags.tag[0].name);
-				
-				if(_genre == undefined){
-					_genre = new Genre(data.artist.tags.tag[0].name);
-					genres.push(_genre);
+				console.log(data);
+				if(data.error == undefined){
+					var _genre = GetGenre(data.artist.tags.tag[0].name);
+					
+					if(_genre == undefined){
+						_genre = new Genre(data.artist.tags.tag[0].name);
+						genres.push(_genre);
+					}
+					
+					_genre.addArtist(artist);
+					
+					processedArtists++;
+				}else{
+					processedArtists++;
 				}
-				
-				_genre.addArtist(artist);
-				
-				processedArtists++;
 				if(processedArtists >= artists.length){
-					processGraph();
+						processGraph();
 				}
 			}
 		);
 	});
 }
 
-$(document).ready(function (){
+function getGlobal(){
 	$.getJSON(
 		globalURL,
 		function(data){
@@ -354,4 +360,48 @@ $(document).ready(function (){
 			processArtists();
 		}
 	);
+}
+
+function getUser(username){
+	$.getJSON(
+		userURL + username,
+		function(data){
+			$.each(data.toptracks.track, function(key, track){
+				var _track = new Track(track.mbid, track.name, track.playcount, track.listeners, track.duration);
+				
+				var _artist = GetArtist(track.artist.mbid);
+				
+				if(_artist == undefined){
+					_artist = new Artist(track.artist.mbid, track.artist.name);
+					artists.push(_artist);
+				}
+				
+				_artist.addTrack(_track);
+			});
+			
+			processArtists();
+		}
+	);
+}
+
+function clearGraph(){
+	$("g").empty();
+	artists = [];
+	genres = [];
+}
+
+$(document).ready(function (){
+	getGlobal();
+	
+	$("#btnUserLookup").click(function(){
+		clearGraph();
+		getUser($("#username").val());
+		return false;
+	});
+	
+	$("#btnReset").click(function(){
+		clearGraph();
+		getGlobal();
+		return false;
+	});
 });
