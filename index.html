@@ -19,15 +19,22 @@
 		<div class="container">
 			<h1>Introduction</h1>
 			<p>Musical Sunburst takes information from either the most popular tracks played globally or for a selected user and creates a sunburst tree visualisation of the data</p>
+			<p>	The popularity of each genre/artist/track is encoded in the colouring of each section.
+				<br/>
+				The most saturated and darkest colours indicate the most popular, and vice versa. Outside cell colours are based on that of the inside, with the colour of the genre being randomly generated based on it's popularity, and increase in saturation as they get further out.
+			</p>
+			<p>
+				This visualisation would scale fairly well to 1000 items, due to the fixed levels in the hierarchy. The cells would resize to accommodate for the extra data, and at the 1000 level still allows for individual tracks to be selected directly. At the 10000 level the visualisation will begin to break down. In the worst-case each track will have isn't own artist making the cells for both of these levels impossible to explore directly. It would then be dependant on the genre distribution as to how much limited exploring can be performed.
+			</p>
+			<p>
+				Due to technical limitations, scaling isn't directly available as the functions that show/hide the labels depending on if the label can fit inside the cell it belongs to don't scale. To view it scaled up, manually edit application.js for a larger limit (warning it currently retrieves all the tracks from last.fm in a single request, which along with an increase artist count may cause the API to rate limit)
+			</p>
 			<form class="form-search">
 				<input type="text" class="input-medium search-query" placeholder="last.fm username" id="username"/>
 				<button type="submit" class="btn" id="btnUserLookup">Lookup</button>
 				<button type="submit" class="btn" id="btnReset">Reset</button>
 			</form>
-			<div id="visualisation">
-			
-			</div>
-		
+			<div id="visualisation"></div>
 			<hr />
 			<footer>
 				<p>COMP532 Assignment 4 - Luke Barnett 1109967</p>

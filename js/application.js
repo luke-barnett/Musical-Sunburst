@@ -357,7 +357,7 @@ function deriveColour(baseColour, value){
 		_l = .8;
 	if(_l < .2)
 		_l = .2;
-	return d3.hsl(baseHSL.h + Math.floor(Math.random() * 50) - 25, baseHSL.s + .4 * (value * processedArtists  / totalSize) , _l);
+	return d3.hsl(baseHSL.h + Math.floor(Math.random() * 50) - 25, baseHSL.s + .3 * (value * processedArtists  / totalSize) , _l);
 }
 
 function processArtists(){
