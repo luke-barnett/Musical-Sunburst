@@ -7,3 +7,7 @@ path {
 	stroke-width: 0.5;
 	cursor: pointer;
 }
+
+text {
+	cursor: pointer;
+}
