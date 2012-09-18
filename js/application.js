@@ -366,7 +366,7 @@ function processArtists(){
 		$.getJSON(
 			artistURL + artist.getID(),
 			function(data){
-				if(data.error == undefined){
+				if(data.error == undefined && data.artist.tags.tag != undefined){
 					var _genre = GetGenre(data.artist.tags.tag[0].name);
 					
 					if(_genre == undefined){
@@ -378,6 +378,7 @@ function processArtists(){
 					
 					processedArtists++;
 				}else{
+					console.log(data);
 					processedArtists++;
 				}
 				if(processedArtists >= artists.length){
