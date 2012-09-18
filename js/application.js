@@ -10,6 +10,8 @@ var quantifier = "listeners"
 
 var processedArtists = 0;
 
+var totalSize = 0;
+
 var width = 900,
     height = width,
     radius = width / 2,
@@ -42,9 +44,9 @@ var arc = d3.svg.arc()
 function Track(id, name, playcount, listeners, duration){
 	var _id = id;
 	var _name = name;
-	var _playcount = playcount;
-	var _listeners = listeners;
-	var _duration = duration;
+	var _playcount = parseInt(playcount);
+	var _listeners = parseInt(listeners);
+	var _duration = parseInt(duration);
 	var _colour = randomColour();
 	
 	this.getID = function(){
@@ -76,7 +78,7 @@ function Track(id, name, playcount, listeners, duration){
 	}
 	
 	this.parentColour = function(pColour){
-		_colour = deriveColour(pColour)
+		_colour = deriveColour(pColour, this.getSize())
 	}
 }
 
@@ -85,6 +87,7 @@ function Artist(id, name){
 	var _name = name;
 	var _colour = randomColour();
 	var _tracks = [];
+	var _size = undefined;
 	
 	this.getID = function(){
 		return _id;
@@ -106,8 +109,17 @@ function Artist(id, name){
 		return _colour;
 	}
 	
+	this.getSize = function(){
+		if(_size == undefined){
+			var _size = _tracks.reduce(function(previousValue, currentValue){
+				return previousValue + currentValue.getSize();
+			},0);
+		}
+		return _size;
+	}
+	
 	this.parentColour = function(pColour){
-		_colour = deriveColour(pColour)
+		_colour = deriveColour(pColour, this.getSize());
 		$.each(_tracks, function(key, track){
 			track.parentColour(_colour);
 		});
@@ -135,6 +147,22 @@ function Genre(name){
 	
 	this.getColour = function(){
 		return _colour;
+	}
+	
+	this.getSize = function(){
+		if(_size == undefined){
+			var _size = _artists.reduce(function(previousValue, currentValue){
+				return previousValue + currentValue.getSize();
+			},0);
+		}
+		return _size;
+	}
+	
+	this.calculateColour = function(){
+		_colour = randomColour(this.getSize());
+		$.each(_artists, function(key, artist){
+			artist.parentColour(_colour);
+		});
 	}
 }
 
@@ -197,6 +225,15 @@ function BuildJSON(){
 }
 
 function processGraph(){
+	totalSize = genres.reduce(function(previousValue, currentValue){
+					return previousValue + currentValue.getSize();
+				},0);
+
+	for(var i = 0; i < genres.length; i++){
+		genres[i].calculateColour();
+		console.log(genres[i].getName() + " " + genres[i].getSize() + " [" + genres[i].getSize() / totalSize * 100 + "%]");
+	}
+
 	var json = JSON.parse(BuildJSON());
 	
 	var nodes = partition.nodes({children: json});
@@ -231,7 +268,6 @@ function processGraph(){
 		.attr("x", 0)
 		.text(function(d) { return d.depth ? d.name : ""; })
 		.style("visibility", 	function(d)	{
-												console.log(d + " " + d.dx * 100 / limit);
 												var _name = d.name;
 												if(_name != undefined){
 													return (d.dx * 100 / limit < 0.02 || _name.length * 12 > radius / 3) ? "hidden" : null;
@@ -268,7 +304,6 @@ function processGraph(){
 			var _isParent = isParentOf(d, e);
 			if(_isParent){
 				var _text = d3.select(this.children[0]);
-				console.log(e.dx * ((d.depth + 1)) * 100 / limit);
 				_text.style("visibility", (!_isParent || e.dx * ((d.depth + 1)) * 100 / limit < 0.02 || (e.name != undefined && e.name.length * 12 > radius / (3 - d.depth))) ? "hidden" : null);
 			}
 			_this.style("visibility", _isParent ? null : "hidden");
@@ -315,14 +350,21 @@ function brightness(rgb) {
 	  return rgb.r * .299 + rgb.g * .587 + rgb.b * .114;
 }
 
-function randomColour(){
-    return d3.hsl(Math.floor(Math.random()*360), .2 + (.6 - .2) * Math.random(), .3 + (.7 - .3) * Math.random()).toString();
+function randomColour(value){
+	if(value != undefined){
+		return d3.hsl(Math.floor(Math.random()*360), .2 + (.4 - .2) * (value / totalSize), .2 + (.7 - .2) * (1 - (value / totalSize))).toString()
+	}
+    return d3.hsl(Math.floor(Math.random()*360), .2 + (.4 - .2) * Math.random(), .3 + (.7 - .3) * Math.random()).toString();
 }
 
-function deriveColour(baseColour){
+function deriveColour(baseColour, value){
 	baseHSL = d3.hsl(baseColour);
-	var randomnumber=Math.floor(Math.random()*11)
-	return d3.hsl(baseHSL.h + Math.floor(Math.random() * 40) - 20, baseHSL.s + .4 * Math.random() , baseHSL.l + .2 * Math.random() - .10);
+	var _l = baseHSL.l + .05 * (1 - (value * processedArtists  / totalSize));
+	if(_l > .8)
+		_l = .8;
+	if(_l < .2)
+		_l = .2;
+	return d3.hsl(baseHSL.h + Math.floor(Math.random() * 50) - 25, baseHSL.s + .4 * (value * processedArtists  / totalSize) , _l);
 }
 
 function processArtists(){
