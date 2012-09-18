@@ -302,6 +302,9 @@ function processGraph(){
 		})
 		.style("fill-opacity", function(e) { return isParentOf(d, e) ? 1 : 1e-6; });
 	}
+	
+	$("#loading").slideUp(1000);
+	$("#visualisation").slideDown(1000);
 }
 
 function isParentOf(p, c){
@@ -445,12 +448,16 @@ $(document).ready(function (){
 	$("#btnUserLookup").click(function(){
 		clearGraph();
 		getUser($("#username").val());
+		$("#loading").slideDown(1000);
+		$("#visualisation").slideUp(1000);
 		return false;
 	});
 	
 	$("#btnReset").click(function(){
 		clearGraph();
 		getGlobal();
+		$("#loading").slideDown(1000);
+		$("#visualisation").slideUp(1000);
 		return false;
 	});
 });

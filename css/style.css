@@ -11,3 +11,7 @@ path {
 text {
 	cursor: pointer;
 }
+
+#loading {
+	text-align: center;
+}
